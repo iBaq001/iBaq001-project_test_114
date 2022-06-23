@@ -5,10 +5,16 @@ import jm.task.core.jdbc.util.Util;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
-import java.util.ArrayList;
+
 import java.util.List;
 
 public class UserDaoHibernateImpl implements UserDao {
+    private static final String sqlCreate = "CREATE TABLE IF NOT EXISTS users (" +
+            "id BIGINT(5) NOT NULL AUTO_INCREMENT PRIMARY KEY," +
+            "name VARCHAR(40) NOT NULL," +
+            "lastName VARCHAR(40) NOT NULL," +
+            "age TINYINT(3))";
+    private static final String sqlDrop = "DROP TABLE IF EXISTS users ";
     public UserDaoHibernateImpl() {
 
     }
@@ -17,24 +23,18 @@ public class UserDaoHibernateImpl implements UserDao {
 
     @Override
     public void createUsersTable() {
-        String sql = "CREATE TABLE IF NOT EXISTS users (" +
-                "id BIGINT(5) NOT NULL AUTO_INCREMENT PRIMARY KEY," +
-                "name VARCHAR(40) NOT NULL," +
-                "lastName VARCHAR(40) NOT NULL," +
-                "age TINYINT(3))";
         try (Session session = sessionFactory.getCurrentSession()) {
             session.beginTransaction();
-            session.createSQLQuery(sql).executeUpdate();
+            session.createSQLQuery(sqlCreate).executeUpdate();
             session.getTransaction().commit();
         }
     }
 
     @Override
     public void dropUsersTable() {
-        String sql = "DROP TABLE IF EXISTS users ";
         try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
-            session.createSQLQuery(sql).executeUpdate();
+            session.createSQLQuery(sqlDrop).executeUpdate();
             session.getTransaction().commit();
         }
 
@@ -64,7 +64,7 @@ public class UserDaoHibernateImpl implements UserDao {
 
     @Override
     public List<User> getAllUsers() {
-        List<User> users = new ArrayList<>();
+        List<User> users;
 
         try (Session session = sessionFactory.getCurrentSession()) {
             session.beginTransaction();
